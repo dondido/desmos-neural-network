@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <meta http-equiv="X-UA-Compatible" content="ie=edge">
+        <title>A Neural Network Playground in your Browser</title>
+        <link rel="stylesheet" href="style.css">
+        <script src="graph.js"></script>
+    </head>
+    <body>
+    <div class="playground-controls">
+        <menu class="timeline-controls">
+            <li><button class="button-reset" title="Reset"></button></li>
+            <li><button class="button-previous" title="Previous Step"></button></li>
+            <li><button class="button-run" title="Run/Pause"></button></li>
+            <li><button class="button-next" title="Next Step"></button></li>
+        </menu>
+        <dl class="hyperparameters">
+            <dt>Epoch</dt>
+            <dd class="epoch">0</dd>
+            <dt>Layers</dt>
+            <dd class="epoch"><input type="text" class="input-layers" value="1"/></dd>
+        </dl>
+    </div>
+    <div id="calculator" class="calculator"></div>
+    <script src="nn.js"></script>
+    <script src="index.js"></script>
+  </body>
+</html>
