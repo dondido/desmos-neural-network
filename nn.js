@@ -53,14 +53,14 @@ function perceptronTrick(weights, bias, features, label, learning_rate = 0.05) {
 	const weightCount = weights.length;
 	if (label === 1) {
 		for (let i = 0; i < weightCount; i ++) {
-			weights[i] += features[i] * learning_rate;
+			weights[i] = Number((weights[i] + features[i] * learning_rate).toFixed(3));
 		}
-		bias += learning_rate;
+		bias = Number((bias + learning_rate).toFixed(2));
 	} else {
 		for (let i = 0; i < weightCount; i ++) {
-			weights[i] -= features[i] * learning_rate;
+			weights[i] = Number((weights[i] - features[i] * learning_rate).toFixed(3));
 		}
-		bias -= learning_rate;
+		bias = Number((bias - learning_rate).toFixed(2));
 	}
 	return { weights, bias };
 }
@@ -69,15 +69,9 @@ const runEpoch = () => {
     if (state.weights[step]) {
         return;
     }
-    /* if (step === 0) {
-        state.errors[step] = 0;
-        state.weights[step] = Array(features[0].length).fill(1);
-        state.biases[step] = DEFAULT_BIAS;
-        return;
-    } */
     const weights = state.weights[step - 1];
     const bias = state.biases[step - 1];
-    const error = meanPerceptronError(weights, bias, features, labels);
+    const error = Number(meanPerceptronError(weights, bias, features, labels).toFixed(3));
     const i = Math.floor(Math.random() * features.length);
     const data = perceptronTrick(weights, bias, features[i], labels[i]);
     state.errors[step] = error;

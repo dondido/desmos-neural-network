@@ -7,7 +7,7 @@ const calculator = Desmos.GraphingCalculator(
         zoomButtons: true,
         settingsMenu: false,
         keypad: false,
-        authorFeatures: true,
+        // authorFeatures: true,
         sliders: false,
         /* showGrid: false, */
     }
@@ -48,27 +48,32 @@ const plotPoint = (point, idx) => {
     latex: `(${point})`,
     label: String(labels[idx]),
     readonly: true,
+    folderId: 'points',
     type: 'expression',
     showLabel: true,
     // dragMode: Desmos.DragModes.XY,
     pointStyle: labels[idx] === 1 ? 'POINT': 'OPEN',
     color: labels[idx] === 1 ? Desmos.Colors.GREEN : Desmos.Colors.RED
 })};
-const plotPoints = () => calculator.setExpressions(features.map(plotPoint));
+const plotPoints = () => setCalculatorState([
+    { type: 'folder', id: 'points', secret: true, "title": "secret Folder", },
+    ...features.map(plotPoint)
+]);
 
 let lastExpressionToHideIndex = 0;
 const setCalculatorState = (list) => {
+    calculatorState.expressions.list = list;
     calculator.setState(calculatorState);
 };
 const createExpression = (value, id) => ({
-    id,
+    id: calculatorState.expressions.list + 1 + id,
     readonly: true,
     type: 'expression',
     latex: `w_{${id}}=${value}`
 });
 const initGraph = () => {
     calculator.setExpressions([
-        { color: 'c74440', type: 'expression', readonly: true, latex: `w_{0}+w_{1}x+w_{2}y=0` },
+        { color: 'c74440', type: 'expression', readonly: true, id: calculatorState.expressions.list, latex: `w_{0}+w_{1}x+w_{2}y=0` },
         ...[DEFAULT_BIAS, ...Array(features[0].length).fill(1)].map(createExpression),
     ]);
     //calculator.setState(calculatorState);
@@ -114,14 +119,12 @@ document.querySelector('.button-reset').onclick = () => {
     calculator.setExpressions(expressions);
 };
 document.querySelector('.button-previous').onclick = () => {
-    console.log(1110, state.step);
     if (state.step) {
         state.step --;
         updateFrame();
     }
 };
 document.querySelector('.button-next').onclick = () => {
-    console.log(1111, state.step);
     state.step < STEPS_MAX && state.step ++;
     updateFrame();
 };
