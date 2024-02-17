@@ -1,30 +1,80 @@
 <!DOCTYPE html>
 <html lang="en">
-    <head>
-        <meta charset="UTF-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <meta http-equiv="X-UA-Compatible" content="ie=edge">
-        <title>A Neural Network Playground in your Browser</title>
-        <link rel="stylesheet" href="style.css">
-        <script src="graph.js"></script>
-    </head>
-    <body>
-    <div class="playground-controls">
-        <menu class="timeline-controls">
-            <li><button class="button-reset" title="Reset"></button></li>
-            <li><button class="button-previous" title="Previous Step"></button></li>
-            <li><button class="button-run" title="Run/Pause"></button></li>
-            <li><button class="button-next" title="Next Step"></button></li>
-        </menu>
-        <dl class="hyperparameters">
-            <dt>Epoch</dt>
-            <dd class="epoch">0</dd>
-            <dt>Layers</dt>
-            <dd class="epoch"><input type="text" class="input-layers" value="1"/></dd>
-        </dl>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>A Neural Network Playground in your Browser</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div id="app">
+        <header class="controls pure-g">
+            <div class="pure-form gutter pure-form-stacked pure-u-1-5">
+                <label>Layers</label>
+                <input class="pure-u-1" id="layers" title="Layers" v-model="layers" @change="setLayers($event.target.value)" />
+                <label>Learning rate</label>
+                <input class="pure-u-1" title="Learning rate" v-model="learningRate"
+                    @change="setLearningRate($event.target.value)" />
+                <label for="compact">Compact
+                    <input id="compact" type="checkbox" v-model="compact" />
+                </label>
+            </div>
+            <div class="pure-form pure-form-stacked pure-u-3-5">
+                <div class="pure-g">
+                    <div class="pure-u-1-2 gutter">
+                        <label>Dataset</label>
+                        <textarea class="pure-u-1" rows="4" v-model="dataset"></textarea>
+                    </div>
+                    <div class="pure-u-1-2 gutter">
+                        <label>Epochs</label>
+                        <input class="pure-u-1" title="epoch" type="number" v-model="epoch" />
+                        <button class="pure-u-1 pure-button" onclick="trainDataset()">Train Dataset </button>
+                    </div>
+                </div>
+            </div>
+            <div class="pure-form gutter pure-form-stacked pure-u-1-5">
+                <label>
+                    <button class="pure-u-1 pure-button" onclick="train()">Train</button>
+                </label>
+                <label>
+                    <button class="pure-u-1 pure-button" onclick="trainStepByStep()">Train step-by-step</button>
+                </label>
+                <label>
+                    <button class="pure-u-1 pure-button" onclick="stepTrain()"
+                        :disabled="trainGenerator==null">Step</button>
+                </label>
+            </div>
+        </header>
+        <div class="net">
+            <!-- <div class="layer" v-for="(nums,layer) in perceptron.l">
+                <div class="neuron" v-for="n in nums" ref="neuron" :data-layer="layer" :data-index="n"
+                    :class="{compact:compact}">
+                    <div class="hint" v-if="!compact">
+                        <div class="right" title="Error" v-if="errors[layer+'_'+(n-1)] !== undefined">
+                            {{errors[layer+'_'+(n-1)].toFixed(3)}}</div>
+                        <div class="left" title="Weights delta" v-if="weights_delta[layer+'_'+(n-1)] !== undefined">
+                            {{weights_delta[layer+'_'+(n-1)].toFixed(3)}}</div>
+                    </div>
+                    <input v-if="layer==0 || layer==(perceptron.l.length-1)" v-model="layerValues[layer][n-1]"
+                        @input="layer&lt;(perceptron.l.length-1)?run():null" /><span
+                        v-else="v-else">{{layerValues[layer]?layerValues[layer][n-1].toFixed(3):null}}</span>
+                </div>
+                <div class="neuron additional" v-if="layer&lt;perceptron.l.length-1" ref="neuron" :data-layer="layer"
+                    :data-index="nums+1" :class="{compact:compact}"><span>+1</span></div>
+            </div>
+            <div class="weights" v-for="(layer,i) in weights" v-if="!compact">
+                <div class="neur" v-for="(neur,j) in layer">
+                    <input v-for="(w,k) in neur" v-model.number="neur[k]" @input="run" :style="wInputPosition(i,j,k)" />
+                </div>
+            </div>
+            <svg>
+                <g v-for="connect in connections">
+                    <path :d="pathData(connect.path)"></path>
+                </g>
+            </svg> -->
+        </div>
     </div>
-    <div id="calculator" class="calculator"></div>
-    <script src="nn.js"></script>
     <script src="index.js"></script>
-  </body>
+</body>
+
 </html>

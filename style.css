@@ -1,63 +1,114 @@
 body {
-    margin: 0;
+    padding-top: 120px;
 }
-.calculator {
-   /*  width: 300px; */
-    height: 300px;
-    margin: 5px auto;
-    border-radius: 8px;
-    overflow: hidden;
-    border: 1px solid grey;
+.gutter {
+    padding: 1rem;
+    box-sizing: border-box;
 }
-.calculator .dcg-calculator-api-container .dcg-container.dcg-default-border {
+header {
+    height: 100px;
+    width: 100%;
+    z-index: 6;
+    position: fixed;
+    top: 0;
+}
+header .controls {
+    vertical-align: top;
+    height: 120px;
+}
+.net {
+    margin: auto;
+    display: table;
+    position: relative;
+}
+.net .layer {
+    display: table-cell;
+    vertical-align: middle;
+    width: 200px;
+    min-width: 200px;
+    text-align: center;
+    position: relative;
+    z-index: 2;
+    padding: 30px 0;
+}
+.net .layer .neuron {
+    display: block;
+    margin: 12vh 0;
+    margin-left: 70px;
+    border: 1px solid gray;
+    width: 60px;
+    height: 60px;
+    border-radius: 60px;
+    line-height: 60px;
+    background: white;
+    cursor: default;
+    position: relative;
+}
+.net .layer .neuron.additional {
+    line-height: 42px;
+    width: 42px;
+    height: 42px;
+    position: relative;
+    left: 40px;
+    top: 40px;
+}
+.net .layer .neuron.compact {
+    margin-top: 4vh;
+    margin-bottom: 4vh;
+}
+.net .layer .neuron .hint {
+    position: absolute;
+    top: -30px;
+    left: 50%;
+    color: #ff6e62;
+}
+
+.net .layer .neuron .hint .right {
+    position: absolute;
+    left: 20px;
+}
+.net .layer .neuron .hint .left {
+    position: absolute;
+    right: 20px;
+}
+.net .layer .neuron input {
+    width: 60px;
+    height: 60px;
+    text-align: center;
+    z-index: 4;
     border: 0;
+    background: radial-gradient(ellipse at center, white 20%, transparent 70%);
+    color: #4c4;
+    font-size: 16px;
 }
-.playground-controls {
-    
+.net .layer .neuron span {
+    color: #999;
 }
-.timeline-controls {
-    display: flex;
-    list-style: none;
-    padding: 0;
-    align-items: center;
+.net .layer .neuron:before {
+    content: "";
 }
-.button-reset,
-.button-previous,
-.button-run,
-.button-next {
-    background-color: transparent;
+.weights input {
+    position: absolute;
+    text-align: center;
+    z-index: 4;
     border: 0;
-    cursor: pointer;
-    width: 36px;
-    height: 36px;
-    background-size: 36px 36px;
-    background-repeat: no-repeat;
-    border-radius: 50%;
-    margin-inline: 6px;
+    background: radial-gradient(ellipse at center, white 20%, transparent 70%);
+    color: #4c4;
+    width: 80px;
+    font-size: 15px;
+    padding: 4px 6px;
+    box-sizing: border-box;
+    transform: translate(-50%, -50%);
 }
-.button-reset:hover,
-.button-previous:hover,
-.button-run:hover,
-.button-next:hover {
-    background-color: lightcoral;
+svg {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 1;
 }
-.button-run {
-    background-image: url(./play_circle_black_24dp.svg);
-    width: 48px;
-    height: 48px;
-    background-size: 48px 48px;
-}
-.button-run.paused {
-    background-image: url(./pause_circle_black_24dp.svg);
-}
-.button-reset {
-    background-image: url(./replay_black_24dp.svg);
-    background-size: 28px 28px;
-    background-position: 4px;
-}
-.button-previous {
-    background-image: url(./skip_previous_black_24dp.svg);
-}
-.button-next {
-    background-image: url(./skip_next_black_24dp.svg);
+svg path {
+    stroke: #c2a6cf;
+    stroke-width: 1px;
 }

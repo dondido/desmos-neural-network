@@ -42,17 +42,17 @@ document.querySelector('.button-run').onclick = () => {
 };
 document.querySelector('.button-reset').onclick = () => {
     Object.assign(state, DEFAULT_STATE);
-    runEpoch();
+    runStep();
     updateGraph();
 };
 document.querySelector('.button-previous').onclick = () => {
     state.step && state.step --;
-    runEpoch();
+    runStep();
     updateGraph();
 };
 document.querySelector('.button-next').onclick = () => {
     state.step < DEFAULT_EPOCHS && state.step ++;
-    runEpoch();
+    runStep();
     updateGraph();
 };
 calculator.setMathBounds({
