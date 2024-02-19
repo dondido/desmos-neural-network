@@ -28,21 +28,14 @@
                     <div class="pure-u-1-2 gutter">
                         <label>Epochs</label>
                         <input class="pure-u-1" title="epoch" type="number" v-model="epoch" />
-                        <button class="pure-u-1 pure-button" onclick="trainDataset()">Train Dataset </button>
+                        <button class="pure-u-1 pure-button" onclick="app.trainDataset()">Train Dataset</button>
                     </div>
                 </div>
             </div>
             <div class="pure-form gutter pure-form-stacked pure-u-1-5">
-                <label>
-                    <button class="pure-u-1 pure-button" onclick="train()">Train</button>
-                </label>
-                <label>
-                    <button class="pure-u-1 pure-button" onclick="trainStepByStep()">Train step-by-step</button>
-                </label>
-                <label>
-                    <button class="pure-u-1 pure-button" onclick="stepTrain()"
-                        :disabled="trainGenerator==null">Step</button>
-                </label>
+                <button class="pure-u-1 pure-button" onclick="app.train()">Train</button>
+                <button class="pure-u-1 pure-button button-enable-training-by-step" onclick="app.trainStepByStep()">Train step-by-step</button>
+                <button class="pure-u-1 pure-button button-step-train" disabled onclick="app.stepTrain()">Step</button>
             </div>
         </header>
         <div class="net">

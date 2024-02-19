@@ -71,7 +71,7 @@ class Perceptron {
                         }).reduce((a, b) => a + b)
                     );
             weights_delta = actual.map((x, i) => error[i] * self.dx(x));
-
+            console.log(2222, actual, expected, layer, self.values);
             for (var i = 0; i < error.length; i++)
                 yield { layer, i, error: error[i] };
 
@@ -112,7 +112,7 @@ var app = {
         compact: false,
         learningRate: 0.1,
         dataset: `0 0|0\n0 1|1\n1 0|1\n1 1|1`,
-        epoch: 100,
+        epoch: 8,
         errors: [],
         weights_delta: []
     },
@@ -175,12 +175,12 @@ var app = {
         this.data.mounted = false;
         requestAnimationFrame(() => {
             this.data.mounted = true;
-            this.$forceUpdate();
+            update();
         });
     },
     setLayers(val) {
         this.layers = val
-            .split(",")
+            .split(',')
             .map(v => parseInt(v))
             .filter(v => Number.isInteger(v))
             .filter(v => v > 0);
@@ -193,7 +193,7 @@ var app = {
     recreate() {
         var inputs = new Array(this.layers[0]).fill(0);
         this.perceptron = new Perceptron(this.layers, inputs, this.learningRate);
-        this.update();
+        update();
         this.cancelTrain();
     },
     neuronPosition(n) {
@@ -225,10 +225,7 @@ var app = {
             return `left: ${c[0]}px; top: ${c[1]}px;`;
         }
     },
-    pathData(path) {
-        var p = path;
-        return `M ${p[0]} ${p[1]} L ${p[2]} ${p[3]}`;
-    },
+    
     run() {
         this.cancelTrain();
         this.layerValues = this.perceptron.run(app.data.perceptron.values[0]);
@@ -243,13 +240,14 @@ var app = {
         });  
     },
     cancelTrain() {
+        $buttonStepTrain.disabled = true;
         this.trainGenerator = null;
         this.errors = [];
         this.weights_delta = [];
     },
     stepTrain() {
         var value = this.trainGenerator.next().value;
-
+        //console.log(1111, value, value == null);
         if (value == null)
             this.cancelTrain();
         else if (value.error !== undefined)
@@ -257,87 +255,113 @@ var app = {
         else if (value.weights_delta !== undefined)
             this.weights_delta[value.layer + '_' + value.i] = value.weights_delta;
 
-        this.$forceUpdate();
+        update();
     },
     trainStepByStep() {
         var inputs = this.layerValues[0];
         var expected = this.layerValues[this.layerValues.length - 1];
         this.trainGenerator = this.perceptron.train(inputs, expected);
+        $buttonStepTrain.disabled = false;
     },
     train(inputs, expected) {
         this.cancelTrain();
-        inputs = inputs || this.layerValues[0];
-        expected = expected || this.layerValues[this.layerValues.length - 1];
+        inputs = inputs ?? this.layerValues[0];
+        expected = expected ?? this.layerValues[this.layerValues.length - 1];
+        console.log(44444, inputs, expected);
         var gen = this.perceptron.train(inputs, expected);
 
         for (let state; state = gen.next().value;) {
-            // console.log('>>>', state);
+            console.log('>>>', state, this.layerValues);
         }
     },
     trainDataset() {
-        var dataset = this.dataset.split('\n').map(list => {
-            var inputs = list.split('|')[0].split(' ');
-            var outputs = list.split('|')[1].split(' ');
+        var dataset = app.data.dataset.split('\n').map(list => {
+            var inputs = list.split('|')[0].split(' ').map(Number);
+            var outputs = list.split('|')[1].split(' ').map(Number);
             return { inputs, outputs };
         });
-
-        for (var i = 0; i < this.epoch; i++)
+        for (var i = 0; i < this.epoch; i++){
             dataset.forEach(set => {
                 this.train(set.inputs, set.outputs);
-            });
+            });}
     },
     mounted() {
         this.mounted = true;
     }
 };
 const $net = document.querySelector('.net');
-const interpolate = () => {
+const $buttonStepTrain = document.querySelector('.button-step-train');
+let $weightValues;
+let $neurontValues;
+const update = () => {
+    const neurons = app.layerValues.flat();
+    const weights = app.computed.weights().flat(2);
+    $neurontValues.forEach(($element, i) => {
+        $element.value ? $element.value = neurons[i] : $element.textContent = neurons[i].toFixed(3);
+    });
+    $weightValues.forEach(($element, i) => $element.value = weights[i]);
+};
+const build = () => {
+    let html = '';
     const layerCount = app.data.perceptron.l.length - 1;
-    const layers = app.data.perceptron.l.reduce((layers, nums, layer) => {
-        const createNeuron = (neurons = '', _, idx) => {
-            neurons = `${neurons}<div class="neuron" data-layer="${layer}" data-index="${idx}">`
+    const compact = app.data.compact ? 'compact' : '';
+    for (let i = 0; i < app.data.perceptron.l.length; i++) {
+        const nums = app.data.perceptron.l[i];
+        html += '<div class="layer">';
+        for (let j = 0; j < nums; j++) {
+            html += `<div class="neuron ${compact}" data-layer="${i}" data-index="${j + 1}">`;
             if (!compact) {
-                const ref = `${layer}_${idx - 1}`;
+                const ref = `${i}_${j}`;
                 const error = app.data.errors[ref];
                 const weight = app.data.weights_delta[ref];
-                neurons += '<div class="hint">';
+                html += '<div class="hint">';
                 if (error !== undefined) {
-                    neurons += `<div class="right" title="Error">${error.toFixed(3)}</div>`
+                    html += `<div class="right" title="Error">${error.toFixed(3)}</div>`
                 }
                 if (weight !== undefined) {
-                    neurons += `<div class="left" title="Weights delta">${weight.toFixed(3)}</div>`
+                    html += `<div class="left" title="Weights delta">${weight.toFixed(3)}</div>`
                 }
+                html += '</div>';
             }
-            const value = app.layerValues[layer][idx - 1];
-            if (layer === 0 || layer === layerCount) {
-                neurons += `<input value="${value}" onchange="${layer < layerCount ? 'app.run' : ''}" />`
+            const value = app.layerValues[i][j];
+            if (i === 0 || i === layerCount) {
+                html += `<input class="neuron-value" value="${value}" onchange="${i < layerCount ? 'app.run' : ''}" />`
             }
             else {
-                neurons += `<span>${ app.layerValues[layer] ? value.toFixed(3) : '' }</span>`;
+                html += `<span class="neuron-value">${ app.layerValues[i] ? value.toFixed(3) : '' }</span>`;
             }
-            return `${neurons}</div>`;
-        };
-        layers += `<div class="layer">${Array.from({ length: nums + 1 }).reduce(createNeuron)}`;
-        if (layer < layerCount) {
-            layers += `<div class="neuron additional" data-layer="${layer}" data-index="${nums + 1}" class="{compact:compact}"><span>+1</span></div>`
+            html += '</div>';
         }
-        return `${layers}</div>`;
-    }, '');
-    $net.innerHTML = layers;
-    const weight = app.computed.weights().reduce((weights = '', layer, i) => {
-        const neurs = layer.reduce((neurs, neur, j) => {
-            const ws = neur.reduce((ws = '', w, k) => {
-                return `${ws}<input @input="run" style="${app.wInputPosition(i, j, k)}" value=${neur[k]} />`
-            }, '');
-            return `${neurs}<div class="neur">${ws}</div>`;
-        }, '');
-        return `${weights}<div class="weights">${neurs}</div>`
-    }, '');
-    $net.insertAdjacentHTML('beforeend', weight);
-    const gs = app.computed.connections().reduce((gs, connect) => {
-        return `${gs}<g><path d="${app.pathData(connect.path)}"></path></g>`
-    }, '');
-    $net.insertAdjacentHTML('beforeend', `<svg>${gs}</svg>`);
+        if (i < layerCount) {
+            html += `<div class="neuron additional" data-layer="${i}" data-index="${nums + 1}" class="${compact}"><span>+1</span></div>`
+        }
+        html += '</div>';
+    }
+    $net.innerHTML = html;
+    html = '';
+    const weights = app.computed.weights();
+    for (const i in weights) {
+        const layer = weights[i];
+        html += '<div class="weights">';
+        for (const j in layer) {
+            const neur = layer[j];
+            html += '<div class="neur">';
+            for (const k in neur) {
+                html += `<input class="weight-value" @input="run" style="${app.wInputPosition(+i, +j, +k)}" value=${neur[k]} />`
+            }
+            html += '</div>';
+        }
+        html += `</div>`
+    }
+    $net.insertAdjacentHTML('beforeend', html);
+    html = '';
+    const connections = app.computed.connections();
+    for(const { path: [ p0, p1, p2, p3 ] } of connections) {
+        html += `<path d="M ${p0} ${p1} L ${p2} ${p3}"/>`
+    }
+    $weightValues = document.querySelectorAll('.weight-value');
+    $neurontValues = document.querySelectorAll('.neuron-value');
+    $net.insertAdjacentHTML('beforeend', `<svg>${html}</svg>`);
 };
 
 window.addEventListener('resize', app.update);
@@ -350,4 +374,4 @@ document.getElementById('layers').oninput = ({ target }) => {
 };
 app.init();
 app.run();
-interpolate();
+build();
