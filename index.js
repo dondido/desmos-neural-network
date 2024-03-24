@@ -35,7 +35,6 @@ class Perceptron {
 
     run(inputs) {
         this.clearValues(inputs);
-        var additional = 1;
 
         for (var l = 0; l < this.w.length; l++) {
             for (var i = 0; i < this.values[l].length; i++)
@@ -71,8 +70,11 @@ class Perceptron {
                         }).reduce((a, b) => a + b)
                     );
             weights_delta = actual.map((x, i) => error[i] * self.dx(x));
-            console.log(2222, actual, expected, layer, self.values);
+            // console.log(22221, weights_delta, error, layer, actual, expected);
             for (var i = 0; i < error.length; i++)
+                /* if (layer == 2) {
+                    console.log(11111, error[i]);
+                } */
                 yield { layer, i, error: error[i] };
 
             var prevVal = [...self.values[layer - 1], 1];
@@ -87,12 +89,13 @@ class Perceptron {
             for (var i = 0; i < weights_delta.length; i++)
                 yield { layer, i, weights_delta: weights_delta[i] };
         };
-
-
-
+        
         for (var i = this.values.length - 1; i > 0; i--)
-            for (var value of correctWeights(i))
+            for (var value of correctWeights(i)) {
+                // console.log('22220', i, value);
                 yield value;
+            }
+                
 
 
         this.run(inputs);
@@ -101,6 +104,13 @@ class Perceptron {
 
 var layers = [2, 2, 1];
 var inputs = [0, 1];
+const DEFAULT_DATESET = `0 0|0\n0 1|1\n1 0|1\n1 1|1`;
+let dataset = DEFAULT_DATESET.split('\n').map(list => {
+    const [a, b] = list.split('|');
+    var inputs = a.split(' ').map(Number);
+    var outputs = b.split(' ').map(Number);
+    return { inputs, outputs };
+});
 
 var app = {
     el: "#app",
@@ -111,8 +121,8 @@ var app = {
         mounted: false,
         compact: false,
         learningRate: 0.1,
-        dataset: `0 0|0\n0 1|1\n1 0|1\n1 1|1`,
-        epoch: 8,
+        dataset: DEFAULT_DATESET,
+        epoch: 100,
         errors: [],
         weights_delta: []
     },
@@ -163,12 +173,6 @@ var app = {
                 }
             }
             return lines;
-        }
-    },
-    watch: {
-        compact() {
-            this.update();
-            this.run();
         }
     },
     update() {
@@ -229,6 +233,7 @@ var app = {
     run() {
         this.cancelTrain();
         this.layerValues = this.perceptron.run(app.data.perceptron.values[0]);
+        console.log(3333, this.layerValues, app.data.perceptron.values);
     },
     init() {
         Object.assign(this, this.data);
@@ -260,6 +265,7 @@ var app = {
     trainStepByStep() {
         var inputs = this.layerValues[0];
         var expected = this.layerValues[this.layerValues.length - 1];
+        
         this.trainGenerator = this.perceptron.train(inputs, expected);
         $buttonStepTrain.disabled = false;
     },
@@ -267,21 +273,20 @@ var app = {
         this.cancelTrain();
         inputs = inputs ?? this.layerValues[0];
         expected = expected ?? this.layerValues[this.layerValues.length - 1];
-        console.log(44444, inputs, expected);
         var gen = this.perceptron.train(inputs, expected);
-
+        // console.log(1118, inputs, expected);
         for (let state; state = gen.next().value;) {
+            if (state.layer === 2 && state.error) {
+                // console.log(1119, state.error, inputs, expected);
+            }
             console.log('>>>', state, this.layerValues);
         }
     },
     trainDataset() {
-        var dataset = app.data.dataset.split('\n').map(list => {
-            var inputs = list.split('|')[0].split(' ').map(Number);
-            var outputs = list.split('|')[1].split(' ').map(Number);
-            return { inputs, outputs };
-        });
+        
         for (var i = 0; i < this.epoch; i++){
             dataset.forEach(set => {
+                console.log(1117, set.inputs);
                 this.train(set.inputs, set.outputs);
             });}
     },

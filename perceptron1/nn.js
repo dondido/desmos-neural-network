@@ -11,21 +11,24 @@ const createPerceptron = layer => () => ({
     layer,
     history: [{
         error: 0,
+        prediction: 0,
         weights: [1, 1],
         bias: DEFAULT_BIAS,
     }],
+    errors: [0],
+    weights: [[1, 1]],
+    biases: [DEFAULT_BIAS],
 });
 const createHiddenLayer = (perceptronCount, layer) => Array.from({ length: perceptronCount }, createPerceptron(layer));
-const layerRaw = document.querySelector('.input-layers').value.split(',').filter(Boolean).map(Number);
-console.log(111111, layerRaw);
+const layerRaw = document.querySelector('.input-layers').value.split(',').filter(Boolean);
 const inputs = [[...layerRaw.map(() => ([])), features[randomInt(0, features.length - 1)]]];
-const perceptrons = [...layerRaw.flatMap(createHiddenLayer), createPerceptron(layerRaw.length)()];
+const percetrons = [...layerRaw.flatMap(createHiddenLayer), createPerceptron(layerRaw.length)()];
 const samples = [];
 const sampleIndex = 0;
 let step = 0;
 let sample = 0;
 let perceptronId = 0;
-let activePerceptron = perceptrons[perceptronId];
+let activePerceptron = percetrons[perceptronId];
 const labels = [0, 1, 1, 1];
 const DEFAULT_EPOCHS = 200;
 
@@ -89,13 +92,11 @@ const triggerPerceptron = (weights, bias, inputs, label, learning_rate = 0.05) =
     const error = Math.abs(score(weights, bias, inputs));
 	if (label === 1) {
 		for (let i = 0; i < weightCount; i ++) {
-            console.log(333333333, weights[i], inputs);
 			weights[i] = Number((weights[i] + inputs[i] * learning_rate).toFixed(3));
 		}
 		bias = Number((bias + learning_rate).toFixed(2));
 	} else {
 		for (let i = 0; i < weightCount; i ++) {
-            console.log(333333333, weights[i], inputs);
 			weights[i] = Number((weights[i] - inputs[i] * learning_rate).toFixed(3));
 		}
 		bias = Number((bias - learning_rate).toFixed(2));
@@ -109,10 +110,14 @@ const activatePerceptron = () => {
     const previousSample = activePerceptron.history.at(-1);
     const id = randomInt(0, featureCount - 1);
     const { weights, bias, prediction = features[id] } = previousSample;
-    console.log(3333332, prediction, features[id]); 
-    const fragment = triggerPerceptron(weights, bias, features[id], labels[id]);
+    const fragment = triggerPerceptron(weights, bias, prediction, labels[id]);
     activePerceptron.history.push(fragment);
-    const error = Number(meanPerceptronError(weights, bias, features, labels).toFixed(3));
+    //const error = Number(meanPerceptronError(weights, bias, features, labels).toFixed(3));
+    /* const i = Math.floor(Math.random() * features.length);
+    const data = perceptronTrick(weights, bias, features[i], labels[i]);
+    activePerceptron.errors[sample] = error;
+    activePerceptron.weights[sample] = data.weights;
+    activePerceptron.biases[sample] = data.bias;*/
 }; 
 const activatePerceptron1 = () => {
     if (activePerceptron.history[sample]) {

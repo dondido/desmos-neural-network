@@ -81,9 +81,7 @@ const initGraph = () => {
 
 const updateGraph = () => {
     folderId = String(sample);
-    const { bias, weights } = perceptrons[0].history[sample];
-    console.log(11112, perceptrons, sample, [bias, ...weights]);
-    calculator.setExpressions([bias, ...weights].map(createExpression));
+    calculator.setExpressions([...[biases[sample], ...weights[sample]].map(createExpression)]);
     //calculator.setState(calculatorState);
 };
 const $epoch = document.querySelector('.epoch');
@@ -122,7 +120,7 @@ document.querySelector('.button-reset').onclick = () => {
 document.querySelector('.button-previous').onclick = () => {
     if (step) {
         step --;
-        if (step % perceptrons.length === 0) {
+        if (step % percetrons.length === 0) {
             sample --;
             assignFeatureAsInput();
         }
@@ -132,7 +130,7 @@ document.querySelector('.button-previous').onclick = () => {
 document.querySelector('.button-next').onclick = () => {
     if (step < STEPS_MAX) {
         substep ++;
-        if (step % perceptrons.length === 0) {
+        if (step % percetrons.length === 0) {
             sample ++;
             assignFeatureAsInput();
         }
