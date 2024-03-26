@@ -17,15 +17,13 @@ const createPerceptron = layer => () => ({
 });
 const createHiddenLayer = (perceptronCount, layer) => Array.from({ length: perceptronCount }, createPerceptron(layer));
 const layerRaw = document.querySelector('.input-layers').value.split(',').filter(Boolean).map(Number);
-console.log(111111, layerRaw);
 const inputs = [[...layerRaw.map(() => ([])), features[randomInt(0, features.length - 1)]]];
 const perceptrons = [...layerRaw.flatMap(createHiddenLayer), createPerceptron(layerRaw.length)()];
 const samples = [];
 const sampleIndex = 0;
 let step = 0;
 let sample = 0;
-let perceptronId = 0;
-let activePerceptron = perceptrons[perceptronId];
+let activePerceptron = perceptrons[0];
 const labels = [0, 1, 1, 1];
 const DEFAULT_EPOCHS = 200;
 
@@ -89,13 +87,11 @@ const triggerPerceptron = (weights, bias, inputs, label, learning_rate = 0.05) =
     const error = Math.abs(score(weights, bias, inputs));
 	if (label === 1) {
 		for (let i = 0; i < weightCount; i ++) {
-            console.log(333333333, weights[i], inputs);
 			weights[i] = Number((weights[i] + inputs[i] * learning_rate).toFixed(3));
 		}
 		bias = Number((bias + learning_rate).toFixed(2));
 	} else {
 		for (let i = 0; i < weightCount; i ++) {
-            console.log(333333333, weights[i], inputs);
 			weights[i] = Number((weights[i] - inputs[i] * learning_rate).toFixed(3));
 		}
 		bias = Number((bias - learning_rate).toFixed(2));
